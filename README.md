@@ -1,4 +1,4 @@
-# 🏗 Scaffold-ETH + ▲ Next.js
+# 🏗 Scaffold-ETH + ▲ Next.js + Moralis
 
 > everything you need to build on Ethereum! 🚀
 
