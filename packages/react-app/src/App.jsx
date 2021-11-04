@@ -281,7 +281,7 @@ function App(props) {
   let completeDisplay = "";
   if (complete) {
     completeDisplay = (
-      <div style={{ padding: 64, backgroundColor: "#eeffef", fontWeight: "bolder" }}>
+      <div className="triggered" style={{ padding: 64, backgroundColor: "#019878", fontWeight: "bolder" }}>
         🚀 🎖 👩‍🚀 - Staking App triggered `ExampleExternalContract` -- 🎉 🍾 🎊
         <Balance balance={exampleExternalContractBalance} fontSize={64} /> ETH staked!
       </div>
