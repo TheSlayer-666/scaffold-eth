@@ -28,7 +28,7 @@ import Portis from "@portis/web3";
 import Fortmatic from "fortmatic";
 import Authereum from "authereum";
 import humanizeDuration from "humanize-duration";
-
+import { EtherInput } from "./components";
 const { ethers } = require("ethers");
 /*
     Welcome to 🏗 scaffold-eth !
@@ -271,7 +271,7 @@ function App(props) {
   // ** Listen for when the contract has been 'completed'
   const complete = useContractReader(readContracts, "ExampleExternalContract", "completed");
   console.log("✅ complete:", complete);
-
+  const [depositAmount, setDepositAmount] = useState("0");
   const exampleExternalContractBalance = useBalance(
     localProvider,
     readContracts && readContracts.ExampleExternalContract ? readContracts.ExampleExternalContract.address : null,
@@ -537,9 +537,35 @@ function App(props) {
               </Button>
             </div>
 
+            <Row gutter={12} align="middle">
+              <Col span={6} />
+              <Col>
+                <EtherInput
+                  autofocus
+                  price={price}
+                  placeholder="Enter amount..."
+                  onChange={value => {
+                    setDepositAmount(value.toString());
+                  }}
+                />
+              </Col>
+              <Col>
+                <Button
+                  type={balanceStaked ? "success" : "primary"}
+                  disabled={depositAmount == "0" || !depositAmount || !Number(depositAmount)}
+                  onClick={() => {
+                    tx(writeContracts.Staker.stake({ value: ethers.utils.parseEther(depositAmount) }));
+                  }}
+                >
+                  🥩 Stake {depositAmount ?? "0"} ETH!
+                </Button>
+              </Col>
+              <Col span={6} />
+            </Row>
             <div style={{ padding: 8 }}>
               <Button
                 type={"default"}
+                size="large"
                 onClick={() => {
                   tx(writeContracts.Staker.withdraw());
                 }}
@@ -547,18 +573,6 @@ function App(props) {
                 🏧 Withdraw
               </Button>
             </div>
-
-            <div style={{ padding: 8 }}>
-              <Button
-                type={balanceStaked ? "success" : "primary"}
-                onClick={() => {
-                  tx(writeContracts.Staker.stake({ value: ethers.utils.parseEther("0.5") }));
-                }}
-              >
-                🥩 Stake 0.5 ether!
-              </Button>
-            </div>
-
             {/*
                 🎛 this scaffolding is full of commonly used components
                 this <Contract/> component will automatically parse your ABI
@@ -572,7 +586,7 @@ function App(props) {
                 renderItem={item => {
                   return (
                     <List.Item key={item.blockNumber}>
-                      <Address value={item.args[0]} ensProvider={mainnetProvider} fontSize={16} /> =>
+                      <Address value={item.args[0]} ensProvider={mainnetProvider} fontSize={16} />
                       <Balance balance={item.args[1]} />
                     </List.Item>
                   );
