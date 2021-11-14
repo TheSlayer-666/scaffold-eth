@@ -482,16 +482,16 @@ function App(props) {
   console.log("📟 buyTokensEvents:", buyTokensEvents);
 
   const [tokenBuyAmount, setTokenBuyAmount] = useState();
-
+  const [tokenSellAmount, setTokenSellAmount] = useState();
   const ethCostToPurchaseTokens =
     tokenBuyAmount && tokensPerEth && ethers.utils.parseEther("" + tokenBuyAmount / parseFloat(tokensPerEth));
+  const tokensCostToSell = tokenSellAmount && tokensPerEth && ethers.utils.parseEther("" + tokenSellAmount);
   console.log("ethCostToPurchaseTokens:", ethCostToPurchaseTokens);
-
   const [tokenSendToAddress, setTokenSendToAddress] = useState();
   const [tokenSendAmount, setTokenSendAmount] = useState();
 
   const [buying, setBuying] = useState();
-
+  const [selling, setSelling] = useState();
   let transferDisplay = "";
   if (yourTokenBalance) {
     transferDisplay = (
@@ -521,7 +521,9 @@ function App(props) {
             <Button
               type={"primary"}
               onClick={() => {
-                tx(writeContracts.YourToken.transfer(tokenSendToAddress, ethers.utils.parseEther("" + tokenSendAmount)));
+                tx(
+                  writeContracts.YourToken.transfer(tokenSendToAddress, ethers.utils.parseEther("" + tokenSendAmount)),
+                );
               }}
             >
               Send Tokens
@@ -603,7 +605,40 @@ function App(props) {
                 </div>
               </Card>
             </div>
+            <div style={{ padding: 8, marginTop: 32, width: 300, margin: "auto" }}>
+              <Card title="Sell Tokens">
+                <div style={{ padding: 8 }}>{1 / tokensPerEth && 1 / tokensPerEth.toNumber()} ETH per token</div>
 
+                <div style={{ padding: 8 }}>
+                  <Input
+                    style={{ textAlign: "center" }}
+                    placeholder={"amount of tokens to buy"}
+                    value={tokenSellAmount}
+                    onChange={e => {
+                      setTokenSellAmount(e.target.value);
+                    }}
+                  />
+                  <Balance balance={tokensCostToSell} />
+                </div>
+
+                <div style={{ padding: 8 }}>
+                  <Button
+                    type={"primary"}
+                    loading={selling}
+                    onClick={async () => {
+                      setSelling(true);
+                      // Allow the Tokens
+                      await tx(writeContracts.YourToken.approve(writeContracts.Vendor.address, tokensCostToSell));
+                      // Sell the Tokens
+                      await tx(writeContracts.Vendor.sellTokens(tokensCostToSell));
+                      setSelling(false);
+                    }}
+                  >
+                    Sell Tokens
+                  </Button>
+                </div>
+              </Card>
+            </div>
             <div style={{ padding: 8, marginTop: 32 }}>
               <div>Vendor Token Balance:</div>
               <Balance balance={vendorTokenBalance} fontSize={64} />
